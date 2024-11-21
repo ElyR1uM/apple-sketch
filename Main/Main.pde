@@ -1,5 +1,6 @@
 // Main Sketch for Apple falling simulation
 
+PShape apple;
 OrbitCamera cam;
 void settings() {
   size(1290, 720, P3D);
@@ -7,6 +8,7 @@ void settings() {
 void setup() {
     // Create Orbiting cam to rotate around the scene
     cam = new OrbitCamera();
+    apple = loadShape("apple.obj");
 }
 void draw() {
     // draw
@@ -18,6 +20,6 @@ void draw() {
     pushMatrix();
     cam.applyRotation();
     // Place any object that the camera is supposed to rotate around here
-    box(50, 10, 50);
+    shape(apple);
     popMatrix();
 }
