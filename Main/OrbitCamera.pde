@@ -139,7 +139,7 @@ class OrbitCamera {
   }
   
    /**
-   * Sets wether the y axis in the scene should be facing up or down (by default down)
+   * Sets whether the y axis in the scene should be facing up or down (by default down)
    */
   void setYUp(boolean state) {
     isYUp = state;
