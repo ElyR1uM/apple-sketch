@@ -7,15 +7,17 @@ void settings() {
 void setup() {
     // Create Orbiting cam to rotate around the scene
     cam = new OrbitCamera();
-    background(0);
 }
 void draw() {
     // draw
+    // Cam creator was doing some dirty workarounds by blacking out the last frame to prevent ghosting, need to find a fix for this
+    background(0);
     lights();
     cam.update();
+    // Start of Frame
     pushMatrix();
     cam.applyRotation();
     // Place any object that the camera is supposed to rotate around here
-    box(10);
+    box(50, 10, 50);
     popMatrix();
 }
