@@ -3,7 +3,7 @@
 Apple apple;
 World world;
 OrbitCamera cam;
-float timePrev, deltaY, deltaTime, deltaVel; // Vars for velocity & acceleration
+float deltaY, deltaTime, deltaVel; // Vars for velocity & acceleration
 PShape platform;
 void settings() {
   size(1290, 720, P3D);
@@ -27,9 +27,8 @@ void draw() {
   cam.applyRotation();
 
   // Calculations for Apple Velocity
-  timePrev = millis();
   deltaY = apple.position.y - apple.prevPosition.y;
-  deltaTime = (timePrev - apple.prevVelocity) / 1000.0f;
+  deltaTime = (millis() - apple.prevVelocity) / 1000.0f;
   deltaVel = apple.velocity + apple.acceleration * deltaTime;
   apple.velocity = deltaY / deltaTime;
   apple.acceleration = deltaVel / deltaTime;
@@ -51,8 +50,19 @@ void draw() {
   apple.model.resetMatrix(); // Always sets the models *visible* position to the position of the apple object
   apple.model.translate(apple.position.x, apple.position.y, apple.position.z);
 
+  // For debugging purposes
+  if (keyPressed) {
+    if (key == 'r') {
+      apple.position.y = 0f;
+    }
+  }
+
+  // Logging
+  println("speedValues: " + apple.acceleration + " // " + apple.velocity);
+  println("prevValues: " + apple.prevPosition.y + " // " + apple.prevVelocity);
+  println("deltaValues: " + deltaY + " // " + deltaTime + " // " + deltaVel);
+
   // End of Frame
-  println(apple.acceleration + " // " + apple.velocity);
   popMatrix();
 }
 
@@ -60,6 +70,7 @@ void getCollision(float r_d) {
   // Raycast to see if the apple is colliding with the world
   if (apple.position.y <= world.position.y + r_d) { // less-or-equal operator increases the precision of the apple collision 
     apple.position.y = world.position.y + r_d; // Dirty fix to prevent clipping, subject to change
+    apple.acceleration = 0;
   } else {
     apple.velocity += apple.acceleration * deltaTime * 0.001f; // 0.001f is here to slow down the apple a bit
     apple.position.y += apple.velocity * deltaTime;
