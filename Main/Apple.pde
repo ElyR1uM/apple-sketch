@@ -9,7 +9,4 @@ public class Apple {
         mass = 0.1f;
         position = new PVector(0, 0, 0);
     }
-
-    void calculateVelocity() {
-    }
 }

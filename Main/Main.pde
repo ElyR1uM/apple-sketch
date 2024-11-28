@@ -7,25 +7,33 @@ void settings() {
 }
 
 void setup() {
-    // Create Orbiting cam to rotate around the scene
-    cam = new OrbitCamera();
-    apple = new Apple();
+  cam = new OrbitCamera();
+  apple = new Apple();
 }
 
 void draw() {
-    // draw
-    // Cam creator was doing some dirty workarounds by blacking out the last frame to prevent ghosting, need to find a fix for this
-    background(0);
-    lights();
-    cam.update();
-    // Start of Frame
-    pushMatrix();
-    cam.applyRotation();
-    // Place any object that the camera is supposed to rotate around here
-    shape(apple.model);
-    apple.model.translate(apple.position.x, apple.position.y * force, apple.position.z);
-    println(apple.position);
-    popMatrix();
+  
+  background(0);
+  lights();
+  cam.update();
+
+  // Start of Frame
+  pushMatrix();
+  cam.applyRotation();
+
+  // Render & Update Apple
+  apple.position.y += apple.mass * -9.81f;
+
+  // Render all scene objects
+  shape(apple.model);
+
+  // Update Apple's position
+  apple.model.resetMatrix(); // Always sets the models *visible* position to the position of the apple object
+  apple.model.translate(apple.position.x, apple.position.y, apple.position.z);
+
+  // End of Frame
+  println(apple.position);
+  popMatrix();
 }
 
 void detectCollision(Apple apple) {
