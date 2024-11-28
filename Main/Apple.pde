@@ -1,8 +1,8 @@
 public class Apple {
+    // Radius (down) r_d = 3.75f
     PShape model;
-    float velocity;
-    float mass; // in kg
     PVector position;
+    float mass; // in kg
 
     Apple() {
         model = loadShape("apple.obj");
