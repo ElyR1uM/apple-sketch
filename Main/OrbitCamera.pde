@@ -3,27 +3,6 @@
 */
 import java.awt.Toolkit;
 
-/* Example Project
-OrbitCamera cam;
-void settings() { 
-  size(1200, 800, P3D);
-  smooth();
-}
-void setup() {
-  cam = new OrbitCamera();
-  fill(128);
-}
-void draw() {
-  background(255);
-  lights();
-  cam.update();
-  pushMatrix();
-  cam.applyRotation();
-  box(100);
-  popMatrix();
-}
-*/
-
 final static float screenDPI = Toolkit.getDefaultToolkit().getScreenResolution();
 final static float spinThreshhold = 0.0001;
 
