@@ -25,7 +25,9 @@ void draw() {
   cam.applyRotation();
 
   // Render & Update Apple
-  getCollision();
+  if (!apple.grounded) {
+    getCollision(3.75f); // The down Radius of the Apple is 3.75f
+  }
 
   // Render all scene objects
   shape(apple.model);
@@ -40,16 +42,13 @@ void draw() {
   apple.model.translate(apple.position.x, apple.position.y, apple.position.z);
 
   // End of Frame
-  println(apple.position.y + " // " + world.position.y);
   popMatrix();
 }
 
-void getCollision() {
-  float r = 3.75f;
-
+void getCollision(float r) {
   // Raycast to see if the apple is colliding with the world
-  if (apple.position.y <= world.position.y + r) {
-    println("Colliding!");
+  if (apple.position.y <= world.position.y + r) { // less-or-equal operator increases the precision of the apple collision
+    apple.grounded = true;
   } else {
     apple.position.y += apple.mass * -9.81f;
   }
