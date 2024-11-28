@@ -4,6 +4,6 @@ public class World {
 
     World() {
         model = loadShape("platform.obj");
-        position = new PVector(0f, -13.75f, 0f);
+        position = new PVector(0f, -50f, 0f);
     }
 }

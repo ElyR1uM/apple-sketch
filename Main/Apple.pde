@@ -1,5 +1,5 @@
 public class Apple {
-    // Radius (down) r_d = 3.75f
+    // Radius (down) r_d ~ 3f
     PShape model;
     PVector position, prevPosition;
     float mass; // in kg

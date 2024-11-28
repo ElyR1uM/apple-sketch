@@ -12,6 +12,7 @@ void settings() {
 void setup() {
   cam = new OrbitCamera();
   apple = new Apple();
+  apple.position.y = -1f;
   world = new World();
 }
 
@@ -37,7 +38,7 @@ void draw() {
   apple.prevPosition.y = apple.position.y;
   apple.prevVelocity = apple.velocity;
   if (!apple.grounded) {
-    getCollision(3.75f); // The down Radius of the Apple is 3.75f
+    getCollision(3f); // The down Radius of the Apple is 3.75f
   }
 
   // Render all scene objects
@@ -56,11 +57,13 @@ void draw() {
   popMatrix();
 }
 
-void getCollision(float r) {
+void getCollision(float r_d) {
   // Raycast to see if the apple is colliding with the world
-  if (apple.position.y <= world.position.y + r) { // less-or-equal operator increases the precision of the apple collision
+  if (apple.position.y <= world.position.y + r_d) { // less-or-equal operator increases the precision of the apple collision
     apple.grounded = true;
+    apple.position.y = world.position.y + r_d;
   } else {
-    apple.position.y += apple.mass * -9.81f;
+    apple.velocity += apple.acceleration * deltaTime * 0.001f;
+    apple.position.y += apple.velocity * deltaTime;
   }
 }
