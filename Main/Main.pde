@@ -3,6 +3,7 @@
 Apple apple;
 World world;
 OrbitCamera cam;
+float timePrev, dy, dt, dv; // Vars for velocity & acceleration
 PShape platform;
 void settings() {
   size(1290, 720, P3D);
@@ -15,7 +16,7 @@ void setup() {
 }
 
 void draw() {
-  
+  // "Erase" the last frame
   background(0);
   lights();
   cam.update();
@@ -24,7 +25,17 @@ void draw() {
   pushMatrix();
   cam.applyRotation();
 
+  // Calculations for Apple Velocity
+  timePrev = millis();
+  dy = apple.position.y;
+  dt = (timePrev - apple.prevVelocity) / 1000.0f;
+  dv = apple.velocity + apple.acceleration * dt;
+  apple.velocity = dy / dt;
+  apple.acceleration = dv / dt;
+
   // Render & Update Apple
+  apple.prevPosition.y = apple.position.y;
+  apple.prevVelocity = apple.velocity;
   if (!apple.grounded) {
     getCollision(3.75f); // The down Radius of the Apple is 3.75f
   }
