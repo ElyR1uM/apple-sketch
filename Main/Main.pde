@@ -48,7 +48,7 @@ void getCollision() {
   float r = 3.75f;
 
   // Raycast to see if the apple is colliding with the world
-  if (apple.position.y < world.position.y + r) {
+  if (apple.position.y <= world.position.y + r) {
     println("Colliding!");
   } else {
     apple.position.y += apple.mass * -9.81f;
