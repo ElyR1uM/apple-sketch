@@ -23,6 +23,8 @@ void draw() {
     cam.applyRotation();
     // Place any object that the camera is supposed to rotate around here
     shape(apple.model);
+    apple.model.translate(apple.position.x, apple.position.y * force, apple.position.z);
+    println(apple.position);
     popMatrix();
 }
 

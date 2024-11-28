@@ -1,18 +1,15 @@
 public class Apple {
     PShape model;
     float velocity;
-    float mass;
+    float mass; // in kg
+    PVector position;
+
     Apple() {
         model = loadShape("apple.obj");
+        mass = 0.1f;
+        position = new PVector(0, 0, 0);
     }
 
     void calculateVelocity() {
-        // Calculate velocity based on the difference between the current position and the previous position of the apple
-
-    }
-
-    void calculateAcceleration() {
-        // Calculate acceleration based on the velocity of the apple and gravitational pull
-        
     }
 }
