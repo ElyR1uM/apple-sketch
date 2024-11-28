@@ -37,9 +37,7 @@ void draw() {
   // Render & Update Apple
   apple.prevPosition.y = apple.position.y;
   apple.prevVelocity = apple.velocity;
-  if (!apple.grounded) {
-    getCollision(3f); // The down Radius of the Apple is 3.75f
-  }
+  getCollision(3f); // The down Radius of the Apple is around 3f
 
   // Render all scene objects
   shape(apple.model);
@@ -54,16 +52,16 @@ void draw() {
   apple.model.translate(apple.position.x, apple.position.y, apple.position.z);
 
   // End of Frame
+  println(apple.acceleration + " // " + apple.velocity);
   popMatrix();
 }
 
 void getCollision(float r_d) {
   // Raycast to see if the apple is colliding with the world
-  if (apple.position.y <= world.position.y + r_d) { // less-or-equal operator increases the precision of the apple collision
-    apple.grounded = true;
-    apple.position.y = world.position.y + r_d;
+  if (apple.position.y <= world.position.y + r_d) { // less-or-equal operator increases the precision of the apple collision 
+    apple.position.y = world.position.y + r_d; // Dirty fix to prevent clipping, subject to change
   } else {
-    apple.velocity += apple.acceleration * deltaTime * 0.001f;
+    apple.velocity += apple.acceleration * deltaTime * 0.001f; // 0.001f is here to slow down the apple a bit
     apple.position.y += apple.velocity * deltaTime;
   }
 }
