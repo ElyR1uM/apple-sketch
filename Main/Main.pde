@@ -3,7 +3,7 @@
 Apple apple;
 World world;
 OrbitCamera cam;
-float timePrev, dy, dt, dv; // Vars for velocity & acceleration
+float timePrev, deltaY, deltaTime, deltaVel; // Vars for velocity & acceleration
 PShape platform;
 void settings() {
   size(1290, 720, P3D);
@@ -27,11 +27,11 @@ void draw() {
 
   // Calculations for Apple Velocity
   timePrev = millis();
-  dy = apple.position.y;
-  dt = (timePrev - apple.prevVelocity) / 1000.0f;
-  dv = apple.velocity + apple.acceleration * dt;
-  apple.velocity = dy / dt;
-  apple.acceleration = dv / dt;
+  deltaY = apple.position.y - apple.prevPosition.y;
+  deltaTime = (timePrev - apple.prevVelocity) / 1000.0f;
+  deltaVel = apple.velocity + apple.acceleration * deltaTime;
+  apple.velocity = deltaY / deltaTime;
+  apple.acceleration = deltaVel / deltaTime;
 
   // Render & Update Apple
   apple.prevPosition.y = apple.position.y;
