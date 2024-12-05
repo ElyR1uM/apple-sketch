@@ -3,7 +3,7 @@
 Apple apple;
 World world;
 OrbitCamera cam;
-float deltaY, deltaTime, deltaVel; // Vars for velocity & acceleration
+PVector deltaTime, deltaVel, deltaPos; // Vars for velocity & acceleration
 PShape platform;
 void settings() {
   size(1290, 720, P3D);
@@ -14,11 +14,14 @@ void setup() {
   apple = new Apple();
   apple.position.y = -1f;
   world = new World();
+  deltaTime = new PVector(0, 0, 0);
+  deltaVel = new PVector(0, 0, 0);
+  deltaPos = new PVector(0, 0, 0);
 }
 
 void draw() {
   // "Erase" the last frame
-  background(0);
+  background(122, 183, 255);
   lights();
   cam.update();
 
@@ -27,14 +30,24 @@ void draw() {
   cam.applyRotation();
 
   // Calculations for Apple Velocity
-  deltaY = -1 * abs(apple.position.y - apple.prevPosition.y); // This seems to be the cause of letting the apple fly upwards after resetting
-  deltaTime = (millis() - apple.prevVelocity) / 1000.0f; 
-  deltaVel = apple.velocity + apple.acceleration * deltaTime;
-  apple.velocity = deltaY / deltaTime;
-  apple.acceleration = deltaVel / deltaTime;
+  deltaTime.x = (millis() - apple.prevVelocity.x) / 1000.0f;
+  deltaTime.y = (millis() - apple.prevVelocity.y) / 1000.0f;
+  deltaTime.z = (millis() - apple.prevVelocity.z) / 1000.0f;
+  deltaPos.x = -1 * abs(apple.position.x - apple.prevPosition.x);
+  deltaPos.y = -1 * abs(apple.position.y - apple.prevPosition.y);
+  deltaPos.z = -1 * abs(apple.position.z - apple.prevPosition.z);
+  deltaVel.x = apple.velocity.x + apple.acceleration.x * deltaTime.x;
+  deltaVel.y = apple.velocity.y + apple.acceleration.y * deltaTime.y;
+  deltaVel.z = apple.velocity.z + apple.acceleration.z * deltaTime.z;
+  apple.velocity.x = deltaPos.x / deltaTime.x;
+  apple.velocity.y = deltaPos.y / deltaTime.y;
+  apple.velocity.z = deltaPos.z / deltaTime.z;
+  apple.acceleration.x = deltaVel.x / deltaTime.x;
+  apple.acceleration.y = deltaVel.y / deltaTime.y;
+  apple.acceleration.z = deltaVel.z / deltaTime.z;
 
   // Render & Update Apple
-  apple.prevPosition.y = apple.position.y;
+  apple.prevPosition = apple.position;
   apple.prevVelocity = apple.velocity;
   getCollision(3f); // The down Radius of the Apple is around 3f
 
@@ -60,7 +73,7 @@ void draw() {
   // Logging
   println("speedValues: " + apple.acceleration + " // " + apple.velocity);
   println("prevValues: " + apple.prevPosition.y + " // " + apple.prevVelocity);
-  println("deltaValues: " + deltaY + " // " + deltaTime + " // " + deltaVel);
+  println("deltaValues: " + deltaPos.y + " // " + deltaTime + " // " + deltaVel);
 
   // End of Frame
   popMatrix();
@@ -70,9 +83,9 @@ void getCollision(float r_d) {
   // Raycast to see if the apple is colliding with the world
   if (apple.position.y <= world.position.y + r_d) { // less-or-equal operator increases the precision of the apple collision 
     apple.position.y = world.position.y + r_d; // Dirty fix to prevent clipping, subject to change
-    apple.acceleration = 0;
+    apple.acceleration.y = 0;
   } else {
-    apple.velocity += apple.acceleration * deltaTime * 0.001f; // 0.001f is here to slow down the apple a bit
-    apple.position.y += apple.velocity * deltaTime;
+    apple.velocity.y += apple.acceleration.y * deltaTime.y * 0.1f; // 0.1f is here to slow down the apple a bit
+    apple.position.y += apple.velocity.y * deltaTime.y;
   }
 }
