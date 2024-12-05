@@ -3,8 +3,10 @@
 Apple apple;
 World world;
 OrbitCamera cam;
-PVector deltaTime, deltaVel, deltaPos; // Vars for velocity & acceleration
+float currentTime, previousTime, deltaTime;
+PVector deltaVel, deltaPos; // Vars for velocity & acceleration
 PShape platform;
+
 void settings() {
   size(1290, 720, P3D);
 }
@@ -12,11 +14,11 @@ void settings() {
 void setup() {
   cam = new OrbitCamera();
   apple = new Apple();
-  apple.position.y = -1f;
   world = new World();
-  deltaTime = new PVector(0, 0, 0);
   deltaVel = new PVector(0, 0, 0);
   deltaPos = new PVector(0, 0, 0);
+  apple.position.y = -0.1f;
+  apple.velocity.y = -9.81f;
 }
 
 void draw() {
@@ -30,25 +32,17 @@ void draw() {
   cam.applyRotation();
 
   // Calculations for Apple Velocity
-  deltaTime.x = (millis() - apple.prevVelocity.x) / 1000.0f;
-  deltaTime.y = (millis() - apple.prevVelocity.y) / 1000.0f;
-  deltaTime.z = (millis() - apple.prevVelocity.z) / 1000.0f;
-  deltaPos.x = -1 * abs(apple.position.x - apple.prevPosition.x);
-  deltaPos.y = -1 * abs(apple.position.y - apple.prevPosition.y);
-  deltaPos.z = -1 * abs(apple.position.z - apple.prevPosition.z);
-  deltaVel.x = apple.velocity.x + apple.acceleration.x * deltaTime.x;
-  deltaVel.y = apple.velocity.y + apple.acceleration.y * deltaTime.y;
-  deltaVel.z = apple.velocity.z + apple.acceleration.z * deltaTime.z;
-  apple.velocity.x = deltaPos.x / deltaTime.x;
-  apple.velocity.y = deltaPos.y / deltaTime.y;
-  apple.velocity.z = deltaPos.z / deltaTime.z;
-  apple.acceleration.x = deltaVel.x / deltaTime.x;
-  apple.acceleration.y = deltaVel.y / deltaTime.y;
-  apple.acceleration.z = deltaVel.z / deltaTime.z;
+  previousTime = currentTime;
+  currentTime = millis() / 1000.0f;
+  deltaTime = currentTime - previousTime;
+  deltaPos.set(-1 * abs(apple.position.x - apple.prevPosition.x), -1 * abs(apple.position.y - apple.prevPosition.y), -1 * abs(apple.position.z - apple.prevPosition.z));
+  deltaVel.set(apple.velocity.x + apple.acceleration.x * deltaTime, apple.velocity.y + apple.acceleration.y * deltaTime, apple.velocity.z + apple.acceleration.z * deltaTime);
+  apple.velocity.set(deltaPos.x / deltaTime, deltaPos.y / deltaTime, deltaPos.z / deltaTime);
+  apple.acceleration.set(deltaVel.x / deltaTime, deltaVel.y / deltaTime, deltaVel.z / deltaTime);
 
   // Render & Update Apple
-  apple.prevPosition = apple.position;
-  apple.prevVelocity = apple.velocity;
+  apple.prevPosition.set(apple.position);
+  apple.prevVelocity.set(apple.velocity);
   getCollision(3f); // The down Radius of the Apple is around 3f
 
   // Render all scene objects
@@ -66,14 +60,19 @@ void draw() {
   // For debugging purposes
   if (keyPressed) {
     if (key == 'r') {
-      apple.position.y = 0f;
+      apple.position.y = -0.1f;
+      apple.velocity.y = -9.81f;
+      println(apple.velocity.y);
+    }
+    if (key == 's') {
+      world.position.y -= 10f;
     }
   }
 
   // Logging
-  println("speedValues: " + apple.acceleration + " // " + apple.velocity);
-  println("prevValues: " + apple.prevPosition.y + " // " + apple.prevVelocity);
-  println("deltaValues: " + deltaPos.y + " // " + deltaTime + " // " + deltaVel);
+  // println("speedValues: " + apple.acceleration + " // " + apple.velocity);
+  // println("prevValues: " + apple.prevPosition.y + " // " + apple.prevVelocity);
+  // println("deltaValues: " + deltaPos.y + " // " + deltaTime + " // " + deltaVel);
 
   // End of Frame
   popMatrix();
@@ -84,8 +83,14 @@ void getCollision(float r_d) {
   if (apple.position.y <= world.position.y + r_d) { // less-or-equal operator increases the precision of the apple collision 
     apple.position.y = world.position.y + r_d; // Dirty fix to prevent clipping, subject to change
     apple.acceleration.y = 0;
+    if (apple.prevVelocity.y != 0 && apple.velocity.y < 0) {
+      println("--------------------");
+      println("Collision: " + apple.prevVelocity.y);
+      println("Velocity: " + apple.velocity.y + " // Acceleration: " + apple.acceleration.y);
+      println("--------------------");
+    }
   } else {
-    apple.velocity.y += apple.acceleration.y * deltaTime.y * 0.1f; // 0.1f is here to slow down the apple a bit
-    apple.position.y += apple.velocity.y * deltaTime.y;
+    apple.velocity.y += apple.acceleration.y * deltaTime * 0.001f; // Factor is here to slow down the apple
+    apple.position.y += apple.velocity.y * deltaTime;
   }
 }
