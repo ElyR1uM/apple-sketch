@@ -3,7 +3,7 @@ public class World {
     PVector position;
 
     World() {
-        model = loadShape("island.obj");
+        model = loadShape("platform.obj");
         position = new PVector(0f, -50f, 0f);
     }
 }

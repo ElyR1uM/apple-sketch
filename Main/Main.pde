@@ -27,8 +27,8 @@ void draw() {
   cam.applyRotation();
 
   // Calculations for Apple Velocity
-  deltaY = apple.position.y - apple.prevPosition.y;
-  deltaTime = (millis() - apple.prevVelocity) / 1000.0f;
+  deltaY = -1 * abs(apple.position.y - apple.prevPosition.y); // This seems to be the cause of letting the apple fly upwards after resetting
+  deltaTime = (millis() - apple.prevVelocity) / 1000.0f; 
   deltaVel = apple.velocity + apple.acceleration * deltaTime;
   apple.velocity = deltaY / deltaTime;
   apple.acceleration = deltaVel / deltaTime;
