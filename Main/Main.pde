@@ -34,11 +34,16 @@ void draw() {
   // Calculations for Apple Velocity
   previousTime = currentTime;
   currentTime = millis() / 1000.0f;
-  deltaTime = currentTime - previousTime;
+  deltaTime += currentTime - previousTime; // xd forgot to make it "+=" instead of just "=" Will have to redo adjustments to the calculations now
   deltaPos.set(-1 * abs(apple.position.x - apple.prevPosition.x), -1 * abs(apple.position.y - apple.prevPosition.y), -1 * abs(apple.position.z - apple.prevPosition.z));
   deltaVel.set(apple.velocity.x + apple.acceleration.x * deltaTime, apple.velocity.y + apple.acceleration.y * deltaTime, apple.velocity.z + apple.acceleration.z * deltaTime);
   apple.velocity.set(deltaPos.x / deltaTime, deltaPos.y / deltaTime, deltaPos.z / deltaTime);
   apple.acceleration.set(deltaVel.x / deltaTime, deltaVel.y / deltaTime, deltaVel.z / deltaTime);
+
+  // Terminal velocity check & hard limit
+  if (abs(apple.velocity.y) >= apple.v_t) {
+    apple.velocity.y = -apple.v_t;
+  }
 
   // Render & Update Apple
   apple.prevPosition.set(apple.position);
@@ -60,12 +65,15 @@ void draw() {
   // For debugging purposes
   if (keyPressed) {
     if (key == 'r') {
-      apple.position.y = -0.1f;
-      apple.velocity.y = -9.81f;
-      println(apple.velocity.y);
+      deltaTime = 0;
+      apple.position.set(0, -0.1f, 0);
+      apple.velocity.set(0, -9.81f, 0);
     }
     if (key == 's') {
       world.position.y -= 10f;
+    }
+    if (key == 'w') {
+      world.position.y += 10f;
     }
   }
 
@@ -85,12 +93,16 @@ void getCollision(float r_d) {
     apple.acceleration.y = 0;
     if (apple.prevVelocity.y != 0 && apple.velocity.y < 0) {
       println("--------------------");
-      println("Collision: " + apple.prevVelocity.y);
-      println("Velocity: " + apple.velocity.y + " // Acceleration: " + apple.acceleration.y);
+      println("Collision: " + apple.prevVelocity.y + "m/s");
+      println("Velocity: " + apple.velocity.y + "m/s" +  " // Acceleration: " + apple.acceleration.y);
       println("--------------------");
     }
-  } else {
+  } else { // Doing these calculations using PVector.add() doesn't produce realistic results as far as my attempts go
+    apple.velocity.x += apple.acceleration.x;
+    apple.position.x += apple.velocity.x;
     apple.velocity.y += apple.acceleration.y * deltaTime * 0.001f; // Factor is here to slow down the apple
     apple.position.y += apple.velocity.y * deltaTime;
+    apple.velocity.z += apple.acceleration.z;
+    apple.position.z += apple.velocity.z;
   }
 }
