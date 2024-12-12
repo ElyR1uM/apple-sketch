@@ -4,13 +4,13 @@ Apple apple;
 World world;
 OrbitCamera cam;
 float currentTime, previousTime, deltaTime; // deltaTime is the duration of the current fall in seconds
-PVector deltaVel, deltaPos; // Vars for velocity & acceleration
+PVector deltaVel, deltaPos; //Vars for velocity & acceleration
 PShape platform;
 
 void settings() {
   size(1290, 720, P3D);
 }
-
+ 
 void setup() {
   cam = new OrbitCamera();
   apple = new Apple();
@@ -64,19 +64,20 @@ void draw() {
 
   // For debugging purposes
   if (keyPressed) {
-    if (key == 'r') {
-      deltaTime = 0;
-      apple.position.set(0, -0.1f, 0);
-      apple.velocity.set(0, -9.81f, 0);
-    }
-    if (key == 's') {
-      world.position.y -= 10f;
-    }
-    if (key == 'w') {
-      world.position.y += 10f;
-    }
-    if (key == 'a') {
-      apple.acceleration.x -= 0.1f;
+    switch (key) {
+      case 'r':
+        deltaTime = 0;
+        apple.position.set(0, -0.1f, 0);
+        apple.velocity.set(0, -9.81f, 0);
+        break;
+      case 's':
+        world.position.y--;
+        break;
+      case 'w':
+        world.position.y++;
+        break;
+      default:
+        break;
     }
   }
 
@@ -108,4 +109,8 @@ void getCollision(float r_d) {
     apple.velocity.z += apple.acceleration.z;
     apple.position.z += apple.velocity.z;
   }
+}
+
+void windForce() {
+  
 }
