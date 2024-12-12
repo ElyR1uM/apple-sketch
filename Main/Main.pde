@@ -3,7 +3,7 @@
 Apple apple;
 World world;
 OrbitCamera cam;
-float currentTime, previousTime, deltaTime;
+float currentTime, previousTime, deltaTime; // deltaTime is the duration of the current fall in seconds
 PVector deltaVel, deltaPos; // Vars for velocity & acceleration
 PShape platform;
 
@@ -74,6 +74,9 @@ void draw() {
     }
     if (key == 'w') {
       world.position.y += 10f;
+    }
+    if (key == 'a') {
+      apple.acceleration.x -= 0.1f;
     }
   }
 

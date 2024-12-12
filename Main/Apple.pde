@@ -13,7 +13,6 @@ public class Apple {
         prevVelocity = new PVector(0, 0, 0);
         acceleration = new PVector(0, 0, 0);
         v_t = calculateTerminalVelocity();
-        println(v_t);
     }
 
     // As of right now everything is constant as earth's gravity is always assumed. Subject to change
