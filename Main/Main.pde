@@ -134,5 +134,4 @@ void windForce(float F, boolean axis) {
     wForce.z += F > 0 ? 0.5f * 1.225f * pow(F, 2) * 0.2827f * 0.47f : 0.5f * 1.225f * -pow(F, 2) * 0.2827f * 0.47f;
   }
   apple.acceleration.add(wForce);
-  println("wind");
 }
