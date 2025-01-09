@@ -4,7 +4,7 @@ Apple apple;
 World world;
 OrbitCamera cam;
 float currentTime, previousTime; 
-PVector deltaVel, deltaPos, deltaTime, wForce; // deltaTime is the duration of the current acceleration in seconds
+PVector deltaVel, deltaPos, deltaTime, wForce, boundaries0, boundaries1; // deltaTime is the duration of the current acceleration in seconds
 
 void settings() {
   size(1290, 720, P3D);
@@ -18,6 +18,9 @@ void setup() {
   deltaPos = new PVector(0, 0, 0);
   deltaTime = new PVector(0, 0, 0);
   wForce = new PVector(0, 0, 0);
+  configureVertexMesh();
+  boundaries0 = new PVector(world.surfaceVertexMesh.get(0).x, world.surfaceVertexMesh.get(0).y, world.surfaceVertexMesh.get(0).z);
+  boundaries1 = new PVector(world.surfaceVertexMesh.get(1).x, world.surfaceVertexMesh.get(1).y, world.surfaceVertexMesh.get(1).z);
   apple.position.y = -0.1f;
   apple.velocity.y = -9.81f;
 }
@@ -70,7 +73,7 @@ void draw() {
   // End of Frame (visually)
   popMatrix();
 
-  // For debugging purposes
+  // Player Controls
   if (keyPressed) {
     switch (key) {
       case 'r':
@@ -93,28 +96,16 @@ void draw() {
       case 'd':
         windForce(-5, true);
         break;
-      default:
-        break;
     }
   }
-
-  // Logging
-  // println("speedValues: " + apple.acceleration + " // " + apple.velocity);
-  // println("prevValues: " + apple.prevPosition.y + " // " + apple.prevVelocity);
-  // println("deltaValues: " + deltaPos.y + " // " + deltaTime + " // " + deltaVel);
 }
 
 void getCollision(float r_d) {
   // Raycast to see if the apple is colliding with the world
-  if (apple.position.dist(world.position) <= r_d) { // less-or-equal operator increases the precision of the apple collision 
-    apple.position.y = world.position.y + r_d; // Dirty fix to prevent clipping, subject to change
+  if (apple.position.x <= boundaries0.x && apple.position.x >= boundaries1.x && apple.position.z <= boundaries0.z && apple.position.z >= boundaries1.z && apple.position.y <= boundaries0.y + r_d) {
+    println("Collision Detected");
+    apple.position.y = boundaries0.y + r_d;
     apple.acceleration.y = 0;
-    if (apple.prevVelocity.y != 0 && apple.velocity.y < 0) {
-      println("--------------------");
-      println("Collision: " + apple.prevVelocity.y + "m/s");
-      println("Velocity: " + apple.velocity.y + "m/s" +  " // Acceleration: " + apple.acceleration.y);
-      println("--------------------");
-    }
   } else { // Doing these calculations using PVector.add() doesn't produce realistic results as far as my attempts go
     apple.velocity.x += apple.acceleration.x * deltaTime.x * 0.001f;
     apple.position.x += apple.velocity.x * deltaTime.x;
@@ -123,6 +114,11 @@ void getCollision(float r_d) {
     apple.velocity.z += apple.acceleration.z * deltaTime.z * 0.001f;
     apple.position.z += apple.velocity.z * deltaTime.z;
   }
+}
+
+void configureVertexMesh() {
+  world.surfaceVertexMesh.add(new PVector(100, -50, 100));
+  world.surfaceVertexMesh.add(new PVector(-100, -50, -100));
 }
 
 void windForce(float F, boolean axis) {
