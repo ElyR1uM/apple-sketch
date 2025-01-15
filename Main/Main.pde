@@ -33,10 +33,13 @@ void draw() {
   cam.applyRotation();
 
   // Calculations for Apple Velocity
+  // Formulas if I need to change any:
+  // v(t) = 0.5 * a * t²
+  // a(t) = a
   previousTime = currentTime;
   currentTime = millis() / 1000.0f;
-  deltaTime.add(currentTime - previousTime, currentTime - previousTime, currentTime - previousTime); // xd forgot to make it "+=" instead of just "=" Will have to redo adjustments to the calculations now
-  deltaPos.set(-1 * abs(apple.position.x - apple.prevPosition.x), -1 * abs(apple.position.y - apple.prevPosition.y), -1 * abs(apple.position.z - apple.prevPosition.z));
+  deltaTime.add(currentTime - previousTime, currentTime - previousTime, currentTime - previousTime); // I used PVector.add to reduce the amount of repeating lines
+  deltaPos.set(-1 * abs(apple.position.x - apple.prevPosition.x), -1 * abs(apple.position.y - apple.prevPosition.y), -1 * abs(apple.position.z - apple.prevPosition.z)); // Same explanation as in the line above, every calculation is done for x, y and z axis; -1 here was used to ensure that the apple doesn't "fall up" after resetting
   deltaVel.set(apple.velocity.x + apple.acceleration.x * deltaTime.x, apple.velocity.y + apple.acceleration.y * deltaTime.y, apple.velocity.z + apple.acceleration.z * deltaTime.z);
   apple.velocity.set(deltaPos.x / deltaTime.x, deltaPos.y / deltaTime.y, deltaPos.z / deltaTime.z);
   apple.acceleration.set(deltaVel.x / deltaTime.x, deltaVel.y / deltaTime.y, deltaVel.z / deltaTime.z);
@@ -78,7 +81,7 @@ void draw() {
     switch (key) {
       case 'r':
         deltaTime.set(0, 0, 0);
-        apple.position.set(0, -0.1f, 0);
+        apple.position.set(0, 50f, 0);
         apple.velocity.set(0, -9.81f, 0);
         apple.acceleration.set(0, 0, 0);
         deltaVel.set(0, 0, 0);
@@ -88,13 +91,17 @@ void draw() {
         windForce(-5, false);
         break;
       case 'w':
-        windForce(5, false);
+        windForce(10, false);
         break;
       case 'a':
-        windForce(5, true);
+        windForce(10, true);
         break;
       case 'd':
         windForce(-5, true);
+        break;
+      case 'e':
+        throwApple(100);
+        println("throw");
         break;
     }
   }
@@ -103,10 +110,9 @@ void draw() {
 void getCollision(float r_d) {
   // Raycast to see if the apple is colliding with the world
   if (apple.position.x <= boundaries0.x && apple.position.x >= boundaries1.x && apple.position.z <= boundaries0.z && apple.position.z >= boundaries1.z && apple.position.y <= boundaries0.y + r_d) {
-    println("Collision Detected");
     apple.position.y = boundaries0.y + r_d;
     apple.acceleration.y = 0;
-  } else { // Doing these calculations using PVector.add() doesn't produce realistic results as far as my attempts go
+  } else if (apple.position.y >= -100f){ // Doing these calculations using PVector.add() doesn't produce realistic results as far as my attempts go
     apple.velocity.x += apple.acceleration.x * deltaTime.x * 0.001f;
     apple.position.x += apple.velocity.x * deltaTime.x;
     apple.velocity.y += apple.acceleration.y * deltaTime.y * 0.001f; // Factor is here to slow down the apple
@@ -117,8 +123,8 @@ void getCollision(float r_d) {
 }
 
 void configureVertexMesh() {
-  world.surfaceVertexMesh.add(new PVector(100, -50, 100));
-  world.surfaceVertexMesh.add(new PVector(-100, -50, -100));
+  world.surfaceVertexMesh.add(new PVector(100, -50, 100)); // As of right now this is redundant but in case I want to add a 
+  world.surfaceVertexMesh.add(new PVector(-100, -50, -100)); // colliding surface with more vertices this approach hopefully saves time and effort
 }
 
 void windForce(float F, boolean axis) {
@@ -130,4 +136,14 @@ void windForce(float F, boolean axis) {
     wForce.z += F > 0 ? 0.5f * 1.225f * pow(F, 2) * 0.2827f * 0.47f : 0.5f * 1.225f * -pow(F, 2) * 0.2827f * 0.47f;
   }
   apple.acceleration.add(wForce);
+}
+
+void throwApple(float F) {
+  PVector throwDirection = cam.getDir();
+  println(throwDirection);
+  throwDirection.normalize();
+  throwDirection.mult(F);
+  apple.velocity.y = 0;
+  apple.acceleration.add(throwDirection);
+  apple.acceleration.y = F;
 }

@@ -7,8 +7,8 @@ public class Apple {
     Apple() {
         model = loadShape("apple.obj");
         mass = 0.1f;
-        position = new PVector(0, 0, 0);
-        prevPosition = new PVector(0, 0, 0);
+        position = new PVector(0, 10, 0);
+        prevPosition = new PVector(0, 50f, 0);
         velocity = new PVector(0, 0, 0);
         prevVelocity = new PVector(0, 0, 0);
         acceleration = new PVector(0, 0, 0);
