@@ -38,14 +38,20 @@ void draw() {
   // a(t) = a
   previousTime = currentTime;
   currentTime = millis() / 1000.0f;
-  deltaTime.add(currentTime - previousTime, currentTime - previousTime, currentTime - previousTime); // I used PVector.add to reduce the amount of repeating lines
-  deltaPos.set(-1 * abs(apple.position.x - apple.prevPosition.x), -1 * abs(apple.position.y - apple.prevPosition.y), -1 * abs(apple.position.z - apple.prevPosition.z)); // Same explanation as in the line above, every calculation is done for x, y and z axis; -1 here was used to ensure that the apple doesn't "fall up" after resetting
+  deltaTime.add(currentTime - previousTime, currentTime - previousTime, currentTime - previousTime); // Calculations done: dt = t - t_0
+  deltaPos.set(apple.position.x - apple.prevPosition.x, apple.position.y - apple.prevPosition.y, apple.position.z - apple.prevPosition.z); // -abs() is here to prevent the apple from falling upwards
   deltaVel.set(apple.velocity.x + apple.acceleration.x * deltaTime.x, apple.velocity.y + apple.acceleration.y * deltaTime.y, apple.velocity.z + apple.acceleration.z * deltaTime.z);
+  apple.velocity.set(deltaPos.x / deltaTime.x, deltaPos.y / deltaTime.y, deltaPos.z / deltaTime.z);
+  apple.acceleration.set(deltaVel.x / deltaTime.x, deltaVel.y / deltaTime.y, deltaVel.z / deltaTime.z);
 
   switch (apple.state) {
     case 0:
-      apple.velocity.set(deltaPos.x / deltaTime.x, deltaPos.y / deltaTime.y, deltaPos.z / deltaTime.z);
-      apple.acceleration.set(deltaVel.x / deltaTime.x, deltaVel.y / deltaTime.y, deltaVel.z / deltaTime.z);
+      apple.velocity.x += apple.acceleration.x * deltaTime.x * 0.001f;
+      apple.position.x += apple.velocity.x * deltaTime.x;
+      apple.velocity.y += apple.acceleration.y * deltaTime.y * 0.001f; // Factor is here to slow down the apple
+      apple.position.y += apple.velocity.y * deltaTime.y;
+      apple.velocity.z += apple.acceleration.z * deltaTime.z * 0.001f;
+      apple.position.z += apple.velocity.z * deltaTime.z;
       break;
     case 1:
       break;
@@ -123,12 +129,6 @@ void getCollision(float r_d) {
   } else {
     // Doing these calculations using PVector.add() doesn't produce realistic results as far as my attempts go
     apple.state = 0;
-    apple.velocity.x += apple.acceleration.x * deltaTime.x * 0.001f;
-    apple.position.x += apple.velocity.x * deltaTime.x;
-    apple.velocity.y += apple.acceleration.y * deltaTime.y * 0.001f; // Factor is here to slow down the apple
-    apple.position.y += apple.velocity.y * deltaTime.y;
-    apple.velocity.z += apple.acceleration.z * deltaTime.z * 0.001f;
-    apple.position.z += apple.velocity.z * deltaTime.z;
   }
 }
 
@@ -152,6 +152,7 @@ void throwApple(float F) {
   apple.state = 2;
   PVector throwDirection = cam.getDir();
   println(throwDirection);
+  throwDirection.normalize();
   throwDirection.mult(F);
   apple.velocity.y = 0;
   apple.acceleration.add(throwDirection);
