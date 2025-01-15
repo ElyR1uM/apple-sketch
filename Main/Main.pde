@@ -3,7 +3,7 @@
 Apple apple;
 World world;
 OrbitCamera cam;
-float currentTime, previousTime, deltaTime; 
+float currentTime, previousTime, deltaTime, g, p, C_d;
 PVector deltaVel, deltaPos, wForce, boundaries0, boundaries1;
 
 void settings() {
@@ -41,19 +41,25 @@ void draw() {
 
 	switch (apple.state) {
 		case 0:
-			apple.velocity.x += apple.acceleration.x * deltaTime * 0.005f;
+			apple.velocity.x += apple.acceleration.x * deltaTime * 0.005f; // Constant to adjust the speed of the apple
 			apple.position.x += apple.velocity.x * deltaTime;
-			apple.velocity.y += apple.acceleration.y * deltaTime * 0.005f; // Factor is here to slow down the apple
+			apple.velocity.y += apple.acceleration.y * deltaTime * 0.005f;
 			apple.position.y += apple.velocity.y * deltaTime;
-			apple.velocity.z += apple.acceleration.z * deltaTime * 0.005f;	
+			apple.velocity.z += apple.acceleration.z * deltaTime * 0.005f;
 			apple.position.z += apple.velocity.z * deltaTime;
 			if (apple.velocity.y >= 0) {
 				apple.velocity.y -= 0.2f * apple.velocity.y;
 			}
 			break;
 		case 1:
-			apple.velocity.x *= 0.3f;
-			apple.velocity.z *= 0.3f;
+			apple.velocity.x += apple.acceleration.x * deltaTime * 0.001f;
+			apple.position.x += apple.velocity.x * deltaTime;
+			apple.velocity.z += apple.acceleration.z * deltaTime * 0.001f;	
+			apple.position.z += apple.velocity.z * deltaTime;
+			apple.velocity.x *= 0.001f;
+			apple.velocity.z *= 0.001f;
+			apple.acceleration.x *= 0.001f;
+			apple.acceleration.z *= 0.001f;
 			apple.velocity.y = 0;
 			break;
 		case 2:
@@ -120,6 +126,10 @@ void draw() {
 			case 'e':
 				throwApple(1000);
 				break;
+			case 'm':
+				break;
+			case 'n':
+				break;
 		} 
 	} else {
 		// Gradually slow down the apple if no other forces are applied
@@ -159,17 +169,15 @@ void windForce(float F, int axis) {
 }
 
 void throwApple(float F) {
-	float finishingTime = deltaTime + 10 * (currentTime - previousTime);
+	float finishingTime = deltaTime + 60 * (currentTime - previousTime);
 	PVector throwDirection = cam.getDir();
+	throwDirection.mult(F * 0.5f * 1.225f * 0.2827f * 0.47f);
 	if (apple.wasThrown == false) {
-		throwDirection.mult(F * 0.5f * 1.225f * 0.2827f * 0.47f);
 		apple.acceleration.add(throwDirection);
+		println("Apple was thrown");
 		apple.state = 2;
 		if (finishingTime >= deltaTime) {
-			print("Apple was thrown");
 			apple.wasThrown = true;
 		}
-	} else {
-		apple.state = 0;
 	}
 }
