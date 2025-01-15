@@ -41,9 +41,17 @@ void draw() {
   deltaTime.add(currentTime - previousTime, currentTime - previousTime, currentTime - previousTime); // I used PVector.add to reduce the amount of repeating lines
   deltaPos.set(-1 * abs(apple.position.x - apple.prevPosition.x), -1 * abs(apple.position.y - apple.prevPosition.y), -1 * abs(apple.position.z - apple.prevPosition.z)); // Same explanation as in the line above, every calculation is done for x, y and z axis; -1 here was used to ensure that the apple doesn't "fall up" after resetting
   deltaVel.set(apple.velocity.x + apple.acceleration.x * deltaTime.x, apple.velocity.y + apple.acceleration.y * deltaTime.y, apple.velocity.z + apple.acceleration.z * deltaTime.z);
-  apple.velocity.set(deltaPos.x / deltaTime.x, deltaPos.y / deltaTime.y, deltaPos.z / deltaTime.z);
-  apple.acceleration.set(deltaVel.x / deltaTime.x, deltaVel.y / deltaTime.y, deltaVel.z / deltaTime.z);
 
+  switch (apple.state) {
+    case 0:
+      apple.velocity.set(deltaPos.x / deltaTime.x, deltaPos.y / deltaTime.y, deltaPos.z / deltaTime.z);
+      apple.acceleration.set(deltaVel.x / deltaTime.x, deltaVel.y / deltaTime.y, deltaVel.z / deltaTime.z);
+      break;
+    case 1:
+      break;
+    case 2:
+      break;
+  }
   // Terminal velocity check & hard limit
   if (abs(apple.velocity.x) >= apple.v_t) {
     apple.velocity.x = apple.velocity.x > 0 ? apple.v_t : -apple.v_t;
@@ -101,7 +109,6 @@ void draw() {
         break;
       case 'e':
         throwApple(100);
-        println("throw");
         break;
     }
   }
@@ -112,7 +119,10 @@ void getCollision(float r_d) {
   if (apple.position.x <= boundaries0.x && apple.position.x >= boundaries1.x && apple.position.z <= boundaries0.z && apple.position.z >= boundaries1.z && apple.position.y <= boundaries0.y + r_d) {
     apple.position.y = boundaries0.y + r_d;
     apple.acceleration.y = 0;
-  } else if (apple.position.y >= -100f){ // Doing these calculations using PVector.add() doesn't produce realistic results as far as my attempts go
+    apple.state = 1; // Sets the state to Collide
+  } else {
+    // Doing these calculations using PVector.add() doesn't produce realistic results as far as my attempts go
+    apple.state = 0;
     apple.velocity.x += apple.acceleration.x * deltaTime.x * 0.001f;
     apple.position.x += apple.velocity.x * deltaTime.x;
     apple.velocity.y += apple.acceleration.y * deltaTime.y * 0.001f; // Factor is here to slow down the apple
@@ -139,9 +149,9 @@ void windForce(float F, boolean axis) {
 }
 
 void throwApple(float F) {
+  apple.state = 2;
   PVector throwDirection = cam.getDir();
   println(throwDirection);
-  throwDirection.normalize();
   throwDirection.mult(F);
   apple.velocity.y = 0;
   apple.acceleration.add(throwDirection);

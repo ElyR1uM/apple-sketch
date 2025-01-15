@@ -3,7 +3,7 @@ public class Apple {
     PShape model;
     PVector position, prevPosition, velocity, prevVelocity, acceleration;
     float mass, v_t; // in kg
-
+    int state; // 0 = Fall, 1 = Collide, 2 = Throw
     Apple() {
         model = loadShape("apple.obj");
         mass = 0.1f;
@@ -13,6 +13,7 @@ public class Apple {
         prevVelocity = new PVector(0, 0, 0);
         acceleration = new PVector(0, 0, 0);
         v_t = calculateTerminalVelocity();
+        state = 0;
     }
 
     // As of right now everything is constant as earth's gravity is always assumed. Subject to change

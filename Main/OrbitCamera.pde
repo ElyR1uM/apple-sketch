@@ -6,7 +6,7 @@ import java.awt.Toolkit;
 final static float screenDPI = Toolkit.getDefaultToolkit().getScreenResolution();
 final static float spinThreshhold = 0.0001;
 
-OrbitCamera singelton;
+OrbitCamera singleton;
 
 class OrbitCamera {
 
@@ -35,7 +35,7 @@ class OrbitCamera {
   boolean stateChanged;
   
   OrbitCamera() {
-    singelton = this;
+    singleton = this;
     centerPos = new PVector(0, 0, 0);
     targetCenterPos = new PVector();
     setFOV(60);
@@ -225,8 +225,8 @@ class OrbitCamera {
    * @param dy delty y mouse movement
    */
   void shiftTargetPos(int dx, int dy) {
-    PVector dirY = singelton.getUp();
-    PVector dirX = dirY.cross(singelton.getDir());
+    PVector dirY = singleton.getUp();
+    PVector dirX = dirY.cross(singleton.getDir());
     shiftTargetPos(
         dirX.mult(dx)
         .add(dirY.mult(-dy))
@@ -252,12 +252,12 @@ void handleMouseEvent(MouseEvent event) {
     int dy = mouseY - pmouseY;
     
     if (event.getButton() == LEFT) {
-      singelton.rotateTargetAxes(dx, dy);
+      singleton.rotateTargetAxes(dx, dy);
     }else if (event.getButton() == RIGHT) {
-      singelton.shiftTargetPos(dx, dy);
+      singleton.shiftTargetPos(dx, dy);
     }
   }else if (action == MouseEvent.WHEEL) {
-    singelton.addScrollToTargetZoom(-event.getCount());
+    singleton.addScrollToTargetZoom(-event.getCount());
   }
 }
 
@@ -270,21 +270,21 @@ void handleKeyEvent(KeyEvent event) {
   }
   switch(key) {
     case 'c':
-      singelton.setTargetPos(new PVector());
+      singleton.setTargetPos(new PVector());
       break;
     case 'x':
-      singelton.alignX();
+      singleton.alignX();
       break;
     case 'y':
-      singelton.alignY();
+      singleton.alignY();
       break;
     case 'z':
-      singelton.alignZ();
+      singleton.alignZ();
       break;
   }
 }
 
-void testCamera() {
+/*void testCamera() {
   OrbitCamera cam = new OrbitCamera();  
   cam.yaw = 0;
   cam.pitch = 0;
@@ -307,7 +307,7 @@ void testCamera() {
   assert(isSimilar(new PVector(0, 0.7071, -0.7071), cam.getDir()));
   assert(isSimilar(new PVector(0, -0.7071, -0.7071), cam.getUp()));
 
-}
+}*/
 
 boolean isSimilar(PVector v0, PVector v1) {
   float epsilon = 0.001f;
