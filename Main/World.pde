@@ -6,8 +6,8 @@ public class World {
 
     World() {
         surfaceVertexMesh = new ArrayList<PVector>();
-        r_w = 345f;
+        r_w = 49.4f;
         model = loadShape("island.obj");
-        position = new PVector(0f, -50f - r_w, 0f);
+        position = new PVector(197.5f, r_w, 110f);
     }
 }
