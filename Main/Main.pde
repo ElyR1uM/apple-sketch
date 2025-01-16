@@ -46,14 +46,16 @@ void draw() {
         apple.g = 9.81f;
         apple.p = 1.225f;
         apple.C_d = 0.47f;
-        apple.calculateTerminalVelocity();
+        apple.calculateTerminalVelocity(apple.p, apple.g);
+        println("Terminal Velocity: " + apple.v_t);
         break;
       case 1:
       // Moon
         apple.g = 1.62f;
         apple.p = 0.020f;
         apple.C_d = 0.47f;
-        apple.calculateTerminalVelocity();
+        apple.calculateTerminalVelocity(apple.p, apple.g);
+        println("Terminal Velocity: " + apple.v_t);
         break;
     }
     worldStateChanged = false;
@@ -142,8 +144,7 @@ void draw() {
         elapsedTime = 0;
         deltaTime = 0;
         apple.position.set(0, 11f, 0);
-        apple.velocity.set(0, -apple.g, 0);
-        apple.acceleration.set(0, 0, 0);
+        apple.acceleration.set(0, -apple.g, 0);
         deltaVel.set(0, 0, 0);
         wForce.set(0, 0, 0);
         apple.wasThrown = false;

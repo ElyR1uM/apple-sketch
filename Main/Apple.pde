@@ -14,7 +14,7 @@ public class Apple {
         velocity = new PVector(0, 0, 0);
         prevVelocity = new PVector(0, 0, 0);
         acceleration = new PVector(0, 0, 0);
-        v_t = calculateTerminalVelocity();
+        v_t = calculateTerminalVelocity(p, g);
         state = 0;
         wasThrown = false;
         g = 9.81f;
@@ -23,9 +23,9 @@ public class Apple {
     }
 
     // As of right now everything is constant as earth's gravity is always assumed. Subject to change
-    float calculateTerminalVelocity() {
+    float calculateTerminalVelocity(float p, float g) {
         // Terminal velocity is the maximum velocity that an object can reach during free fall
         // Terminal velocity is given by the equation: v_t = sqrt((2 * m * g) / (p * A * C_d))
-        return sqrt((2 * mass * g) / (p/*Air Density (Avg)*/ * 0.2827f/*Cross-sectional area of the apple in m^2*/ * C_d/*Drag coefficient for the apple*/));
+        return sqrt((2 * mass * g) / (p/*Air Density (Avg)*/ * 0.2827f/*Cross-sectional area of the apple in m^2*/ * 0.47f/*Drag coefficient for the apple*/));
     }
 }
