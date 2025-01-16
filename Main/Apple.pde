@@ -2,7 +2,7 @@ public class Apple {
     // Radius (down) r_d ~ 3f
     PShape model;
     PVector position, prevPosition, velocity, prevVelocity, acceleration;
-    float mass, v_t; // in kg
+    float mass, v_t, g, p, C_d; // in kg
     int state; // 0 = Fall, 1 = Collide, 2 = Throw, 3 = Idle
     boolean wasThrown;
 
@@ -17,12 +17,15 @@ public class Apple {
         v_t = calculateTerminalVelocity();
         state = 0;
         wasThrown = false;
+        g = 9.81f;
+        p = 1.225f;
+        C_d = 0.47f;
     }
 
     // As of right now everything is constant as earth's gravity is always assumed. Subject to change
     float calculateTerminalVelocity() {
         // Terminal velocity is the maximum velocity that an object can reach during free fall
         // Terminal velocity is given by the equation: v_t = sqrt((2 * m * g) / (p * A * C_d))
-        return sqrt((2 * mass * 9.81f) / (1.225f/*Air Density (Avg)*/ * 0.2827f/*Cross-sectional area of the apple in m^2*/ * 0.47f/*Drag coefficient for the apple*/));
+        return sqrt((2 * mass * g) / (p/*Air Density (Avg)*/ * 0.2827f/*Cross-sectional area of the apple in m^2*/ * C_d/*Drag coefficient for the apple*/));
     }
 }
