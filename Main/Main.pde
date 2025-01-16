@@ -46,7 +46,7 @@ void draw() {
         apple.g = 9.81f;
         apple.p = 1.225f;
         apple.C_d = 0.47f;
-        apple.calculateTerminalVelocity(apple.p, apple.g);
+        apple.v_t = apple.calculateTerminalVelocity();
         println("Terminal Velocity: " + apple.v_t);
         break;
       case 1:
@@ -54,7 +54,7 @@ void draw() {
         apple.g = 1.62f;
         apple.p = 0.020f;
         apple.C_d = 0.47f;
-        apple.calculateTerminalVelocity(apple.p, apple.g);
+        apple.v_t = apple.calculateTerminalVelocity();
         println("Terminal Velocity: " + apple.v_t);
         break;
     }
@@ -74,32 +74,29 @@ void draw() {
   switch (apple.state) {
     case 0:
       // Update velocity with acceleration
-      apple.velocity.x += apple.acceleration.x * deltaTime * 0.1f * apple.g;
-      apple.velocity.y += apple.acceleration.y * deltaTime * 0.1f * apple.g;
-      apple.velocity.z += apple.acceleration.z * deltaTime * 0.1f * apple.g;
+      apple.velocity.x += apple.acceleration.x * deltaTime;
+      apple.velocity.y += apple.acceleration.y * deltaTime;
+      apple.velocity.z += apple.acceleration.z * deltaTime;
 
       // Update position with velocity
       apple.position.x += apple.velocity.x * deltaTime;
       apple.position.y += apple.velocity.y * deltaTime;
       apple.position.z += apple.velocity.z * deltaTime;
       
-      // Apply drag force
-      PVector dragForce = apple.velocity.copy();
-      dragForce.mult(-0.5f * apple.p * apple.velocity.mag() * apple.C_d * 0.2827f);
-      apple.acceleration.add(dragForce);
       if (apple.velocity.y > 0) {
         apple.velocity.y *= 0.9f;
         apple.acceleration.y *= 0.9f;
       }
       break;
     case 1:
-      apple.velocity.x += apple.acceleration.x * deltaTime * 0.1f;
+      apple.velocity.x += apple.acceleration.x * deltaTime * apple.C_d;
       apple.position.x += apple.velocity.x * deltaTime;
-      apple.velocity.z += apple.acceleration.z * deltaTime * 0.1f;	
+      apple.velocity.z += apple.acceleration.z * deltaTime * apple.C_d;	
       apple.position.z += apple.velocity.z * deltaTime;
-      apple.velocity.z -= apple.acceleration.z * deltaTime;
-      apple.velocity.x -= apple.acceleration.x * deltaTime;
+      apple.velocity.z -= deltaTime;
+      apple.velocity.x -= deltaTime;
       apple.velocity.y = 0;
+      apple.acceleration.mult(0);
       break;
     case 2:
       apple.velocity.y = 0;
@@ -142,8 +139,8 @@ void draw() {
     switch (key) {
       case 'r':
         elapsedTime = 0;
-        deltaTime = 0;
         apple.position.set(0, 11f, 0);
+        apple.velocity.set(0, 0, 0);
         apple.acceleration.set(0, -apple.g, 0);
         deltaVel.set(0, 0, 0);
         wForce.set(0, 0, 0);
@@ -151,19 +148,19 @@ void draw() {
         apple.state = 3;
         break;
       case 's':
-        windForce(10, 1);
+        windForce(1, 1);
         break;
       case 'w':
-        windForce(-10, 1);
+        windForce(-1, 1);
         break;
       case 'a':
-        windForce(10, 0);
+        windForce(1, 0);
         break;
       case 'd':
-        windForce(-10, 0);
+        windForce(-1, 0);
         break;
       case 'e':
-        throwApple(10);
+        throwApple(5);
         break;
       case 'm':
         world.worldState = 1;
@@ -212,14 +209,16 @@ void windForce(float F, int axis) {
 }
 
 void throwApple(float F) {
-  float finishingTime = elapsedTime + 60 * deltaTime;
+  float finishingTime = elapsedTime + 120 * deltaTime;
   PVector throwDirection = cam.getDir();
-  throwDirection.mult(F * 0.5f * apple.p * 0.2827f * apple.C_d);
+  throwDirection.mult(F);
   if (apple.wasThrown == false) {
     apple.acceleration.add(throwDirection);
     apple.state = 2;
-    if (finishingTime >= elapsedTime) {
-      apple.wasThrown = true;
-    }
+  }
+  if (finishingTime >= elapsedTime) {
+    println("Apple was thrown");
+    apple.wasThrown = true;
+    apple.state = 0;
   }
 }
